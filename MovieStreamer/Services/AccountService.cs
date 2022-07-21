@@ -20,14 +20,40 @@ namespace MovieStreamer.Services
 
         public int CekExist(RegisterViewModel vm)
         {
-            var rec = db.Users.FirstOrDefault(x => x.Email  == vm.Email || x.Phone == vm.Phone);
-            return rec!=null ? 1 : 0;
+            IQueryable<Users> data = db.Users.AsQueryable();
+            if (data.Any())
+            {
+                if (vm.Email != null)
+                    data = data.Where(x => x.Email == vm.Email);
+                else
+                    data = data.Where(x => x.Phone == vm.Phone);
+            }
+            else
+            {
+                return 0;
+            }
+            return data.Count() == 0? 0 : 1;
         }
         public Users Login(LoginViewModel vm)
         {
             string passwordHash = sha256_hash(vm.Password);
             var rec = db.Users.FirstOrDefault(x => (x.Email == vm.UserName || x.Phone == vm.UserName) && x.Password == passwordHash);
             return rec;
+        }
+
+        public SettingViewModel GetOne(string? userId)
+        {
+            if (userId == null)
+                return new SettingViewModel();
+
+            var d = db.Users.FirstOrDefault(x => x.Id.ToString() == userId);
+            if (d == null)
+                return new SettingViewModel();
+            return new SettingViewModel(){
+                Username = d.Username,
+                Email = d.Email,
+                Phone = d.Phone,
+                };
         }
 
         public async Task<LoginOperation> Register(RegisterViewModel vm)
@@ -63,6 +89,43 @@ namespace MovieStreamer.Services
             catch (Exception ex) {
                 
                 return LoginOperation.Failed(ex.ToString());
+            }
+        }
+
+        public async Task<OperationResult> Settings(SettingViewModel viewModel)
+        {
+            try
+            {
+                using (var scope = new TransactionScope(
+                   TransactionScopeOption.Required,
+                   TimeSpan.FromMinutes(60),
+                   TransactionScopeAsyncFlowOption.Enabled
+                   )) 
+                {
+                    var data = db.Users.Find(Convert.ToInt32(viewModel.Id));
+                    if (data != null)
+                    {
+                        data.Username = viewModel.Username;
+                        data.Email = viewModel.Email;
+                        data.Phone = viewModel.Phone;
+                        if (viewModel.Password != null)
+                            data.Password = sha256_hash(viewModel.Password);
+                        data.ModifiedBy = "SYSTEM";
+                        data.ModifiedDate = DateTime.Now;
+
+                        var success = await db.SaveChangesAsync() > 0;
+                        if (success)
+                        {
+                            scope.Complete();
+                            return OperationResult.Success();
+                        }
+                    }
+                    return OperationResult.Failed();
+                }
+            }
+            catch (Exception ex)
+            {
+                return OperationResult.Failed(ex.ToString());
             }
         }
 

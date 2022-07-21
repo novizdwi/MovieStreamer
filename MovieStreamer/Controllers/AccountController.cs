@@ -24,15 +24,55 @@ namespace MovieStreamer.Controllers
             this.services = services;
         }
 
-
         public IActionResult Index()
         {
             return LocalRedirect("/");
         }
+
+        [Authorize]
+        public IActionResult Setting()
+        {
+            string userId = this.ClaimUserId();
+            SettingViewModel vm = services.GetOne(userId);
+            return View(vm);
+        }
+        [HttpPost]
+        public async Task<IActionResult> Setting(SettingViewModel viewModel)
+        {
+            string msg = "";
+            var success = true;
+            if (ModelState.IsValid)
+            {
+                if (String.IsNullOrEmpty(viewModel.Email) && String.IsNullOrEmpty(viewModel.Phone))
+                {
+                    msg = "Email or Phone must not null";
+                    success = false;
+                }
+                if (viewModel.Password != viewModel.ConfirmPassword)
+                {
+                    msg = msg.Length != 0 ? msg + "<br/> Password input is not same" : "Password input is not same";
+                    success = false;
+                }
+                if (success)
+                {
+                    viewModel.Id = this.ClaimUserId();
+                    var result = await services.Settings(viewModel);
+                    if(result.Succeeded)
+                    {
+                        return LocalRedirect("/");
+                    }
+                }
+            }
+
+            ViewBag.Message = msg;
+            return View(viewModel);
+        }
+
         public IActionResult Register()
         {
             return View();
         }
+
         [HttpPost]
         public async Task<IActionResult> Register(RegisterViewModel viewModel)
         {
@@ -72,6 +112,9 @@ namespace MovieStreamer.Controllers
                             var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
                             //Initialize a new instance of the ClaimsPrincipal with ClaimsIdentity
                             var principal = new ClaimsPrincipal(identity);
+                            await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme,
+                                principal, new AuthenticationProperties() );
+                            return LocalRedirect("/");
                         }
                         else
                         {
@@ -101,11 +144,9 @@ namespace MovieStreamer.Controllers
                 }
                 else
                 {
+
                     var claims = new List<Claim>() {
-                    new Claim(ClaimTypes.NameIdentifier,Convert.ToString(result.Id)),
-                                new Claim(ClaimTypes.NameIdentifier, Convert.ToString(result.Id)),
-                                new Claim(ClaimTypes.Email, result.Email),
-                                new Claim(ClaimTypes.MobilePhone, result.Phone),
+                        new Claim(ClaimTypes.NameIdentifier, Convert.ToString(result.Id))
                     };
                     //Initialize a new instance of the ClaimsIdentity with the claims and authentication scheme
                     var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
@@ -114,7 +155,7 @@ namespace MovieStreamer.Controllers
                     //SignInAsync is a Extension method for Sign in a principal for the specified scheme.
                     await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme,
                         principal, new AuthenticationProperties() { IsPersistent = viewModel.RememberLogin });
-
+                    
                     return LocalRedirect(viewModel.ReturnUrl);
                 }
             }
@@ -126,6 +167,13 @@ namespace MovieStreamer.Controllers
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
             //Redirect to home page
             return LocalRedirect("/");
+        }
+
+        private string ClaimUserId()
+        {
+            var identity = (ClaimsIdentity)User.Identity;
+            string userId = identity.Claims.Where(c => c.Type == ClaimTypes.NameIdentifier).Select(c => c.Value).FirstOrDefault();
+            return userId;
         }
     }
 }
