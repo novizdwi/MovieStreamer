@@ -104,9 +104,7 @@ namespace MovieStreamer.Controllers
                         {
                             success = true;
                             var claims = new List<Claim>() {
-                                new Claim(ClaimTypes.NameIdentifier, result.Id),
-                                new Claim(ClaimTypes.Email, result.Email),
-                                new Claim(ClaimTypes.MobilePhone, result.Phone),
+                                new Claim(ClaimTypes.NameIdentifier, Convert.ToString(result.Id))
                             };
                             //Initialize a new instance of the ClaimsIdentity with the claims and authentication scheme
                             var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);

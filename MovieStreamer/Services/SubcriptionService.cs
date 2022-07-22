@@ -69,9 +69,11 @@ namespace MovieStreamer.Services
                        {
                            Id = s.Id,
                            SubscriptionType = s.SubscriptionType,
+                           SubscriptionTypeText = s.SubscriptionType == "M"?"Monthly": s.SubscriptionType=="Y"?"Yearly":"",
                            //SubscriptionTypeText = subscriptionType.Where(x => x.Value == s.SubscriptionType).Select(x => x.Text).FirstOrDefault(),
                            SubscriptionDate = s.SubscriptionDate,
                            PaymentMethod = s.PaymentMethod,
+                           PaymentMethodText= s.PaymentMethod=="VA"? "Virtual Account": s.PaymentMethod == "DBT"? "Direct Bank Transfer": "Master Card",
                            //PaymentMethodText = paymentMethod.Where(x => s.PaymentMethod.Contains(x.Value)).Select(x => x.Text).FirstOrDefault(),
                            Price = s.Price,
                            ExpiredDate = s.ExpiredDate,
