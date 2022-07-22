@@ -21,7 +21,6 @@ namespace MovieStreamer.Controllers
             this.services = services;
         }
 
-
         public IActionResult Index(string field, string searchText, int? page)
         {
             int pageNumber = (page ?? 1);

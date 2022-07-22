@@ -14,4 +14,10 @@ namespace MovieStreamer.Models
         public DateTime? ModifiedDate { get; set; }
         public string? ModifiedBy { get; set; }
     }
+
+    public class TextPair
+    {
+        public string Value { get; set; }
+        public string Text {get; set;}
+    }
 }

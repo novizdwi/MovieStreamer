@@ -23,7 +23,7 @@ namespace MovieStreamer.Services
             return ret / recordPerPage;
         }
 
-        internal List<MovieViewModels> GetAll(string field, string searchText, int page, int recordPerPage)
+        public List<MovieViewModels> GetAll(string field, string searchText, int page, int recordPerPage)
         {
             var ret =(from m in db.Movies
                       select new MovieViewModels() {

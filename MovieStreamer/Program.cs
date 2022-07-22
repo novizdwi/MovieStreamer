@@ -14,6 +14,7 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<MovieService, MovieService>();
 builder.Services.AddScoped<AccountService, AccountService>();
+builder.Services.AddScoped<SubscriptionService, SubscriptionService>();
 
 var app = builder.Build();
 app.UseAuthentication();

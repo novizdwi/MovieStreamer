@@ -13,9 +13,10 @@
         <th class="th-sm">
             Description
         </th>
-        <th class="th-sm">
-            Action
-        </th>
+        @if (User.Identity.IsAuthenticated)
+        {
+            <th>Action</th>            
+        }
     </thead>
     <tbody>
         @if (Model != null)
@@ -27,11 +28,11 @@
                         <br />
                         @Html.DisplayFor(modelItem => item.Title)</td>
                     <td>@Html.DisplayFor(modelItem => item.Description)</td>
-                    <td>
-                        <button id="btnEdit" type="button" class="btn btn-primary" onclick="btnSubscribe(@item.Id)">Subcribe</button>
-                    </td>
                 </tr>
             }
         }
     </tbody>
 </table>
+
+<script type="text/javascript">
+</script>

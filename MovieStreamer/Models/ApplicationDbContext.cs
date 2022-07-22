@@ -21,6 +21,5 @@ namespace MovieStreamer.Models
         public DbSet<Users> Users { get; set; }
         public DbSet<Movie> Movies { get; set; }
         public DbSet<Subscription> Subcriptions { get; set; }
-        public DbSet<SubcriptionDetail> SubcriptionDetails { get; set; }
     }
 }

@@ -1,0 +1,58 @@
+﻿@model MovieStreamer.ViewModels.SubscriptionViewModel
+
+@{
+    ViewData["Title"] = "Subscribe";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<h2>Subscribe</h2>
+
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Subscribe">
+            <div class="form-group pt-3">    
+                <label asp-for="SubscriptionType" class="control-label"></label>
+                <select class="form-control" asp-for="SubscriptionType" asp-items="Model.SubscriptionTypeList">
+                    <option value=""></option>
+                </select>
+                <span asp-validation-for="SubscriptionType" class="text-danger"></span>
+            </div>
+            
+            <div class="form-group pt-3">    
+                <label asp-for="Price" class="control-label"></label>
+                <input asp-for="Price" class="form-control" disabled/>
+                <span asp-validation-for="Price" class="text-danger"></span>
+            </div>
+
+            <div class="form-group pt-3">    
+                <label asp-for="PaymentMethod" class="control-label"></label>
+                <select class="form-control" asp-for="PaymentMethod" asp-items="Model.PaymentMethodList">
+                    <option value=""></option>
+                </select>
+                <span asp-validation-for="PaymentMethod" class="text-danger"></span>
+            </div>
+            
+            <div class="form-group pt-3">    
+                <input type="submit" value="Purchase" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+<script type="text/javascript">
+    $(document).ready(function(){
+        $('#SubscriptionType').on("change", function() { 
+            var st = $('#SubscriptionType').val();
+            var d = new Date();
+
+            if (st.toLowerCase() == 'm') { 
+                $('#Price').val(150350);
+            }else if (st.toLowerCase() == 'y'){
+                $('#Price').val(1503700);
+            }else {
+                $('#Price').val(0);
+            }
+
+        });
+
+    })
+</script>
